@@ -20,7 +20,7 @@ contract Privacy {
     data = _data;
   }
     
-    //on veut 16 bytes donc on prend les 16 premiers bytes de data[2] qui est un bytes32 donc 0x2415f2ba07c2ef20ba1d9fe528a85a49
+    //on veut 16 bytes donc on prend les 16 premiers bytes de data[2] 
   function unlock(bytes16 _key) public {
     require(_key == bytes16(data[2]));
     locked = false;
